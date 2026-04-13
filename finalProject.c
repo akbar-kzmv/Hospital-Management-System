@@ -8,9 +8,9 @@ typedef struct Doctor {
     char name[20];
     char surname[20];
 
-    char *password;
+    char password[30];
 
-    char *specialisation;
+    char specialisation[30];
 
     char contactInfo[15];
 
@@ -25,7 +25,7 @@ typedef struct Patient {
     char name[20];
     char surname[20];
 
-    char *password;
+    char password[30];
 
 
     int age;
@@ -37,10 +37,10 @@ typedef struct Patient {
 
     Doctor assigned_doctor;
 
-}Patient;
+} Patient;
 
 
-char *hospitalPassword = "ufaz2026";
+char hospitalPassword[] = "ufaz2026";
 
 void userInterface(void){}
 
@@ -53,6 +53,7 @@ void lowercase (char *word){
     }
 }
 
+void firstInterface();
 
 void registerInterface(Patient *userList, int patientNumber){
 
@@ -85,29 +86,37 @@ void registerInterface(Patient *userList, int patientNumber){
 
 
 void loginInterface(Patient *userList, int patientNumber){
+    int logincycle = 1;
 
-    printf("Enter the contact info: ");
-    char contactInfo[15];
-    scanf("%s", contactInfo);
-
-
-    printf("Enter password:");
-    char *password;
-    scanf("%s", password);
-
-    for (int i = 0; i < patientNumber; i++){
-        if (!strcmp(password, userList[patientNumber].password) && !strcmp(contactInfo, userList[patientNumber].contactInfo)){
-            userInterface();
-            return;
-        }
-    }
-
-    printf("Wrong credentials!\n");
-
-
-
-
+    while(logincycle) {
+        printf("Enter your phone number: ");
+        char contactInfo[15];
+        scanf("%s", contactInfo);
         
+        if (!strcmp(contactInfo, "back")) {
+            printf("----------------------\n");
+            firstInterface();
+        }
+
+        printf("Enter your password: ");
+        char password[30];
+        scanf("%s", password);
+
+        if (!strcmp(password, "back")) {
+            printf("----------------------\n");
+            firstInterface();
+        }
+
+        for (int i = 0; i < patientNumber; i++){
+            if (!strcmp(password, userList[patientNumber].password) && !strcmp(contactInfo, userList[patientNumber].contactInfo)){
+                logincycle = 0;
+                userInterface();
+                return;
+            }
+        }
+
+        printf("Wrong credentials! Try again!\n");
+    }
     
 
 }
@@ -119,8 +128,27 @@ void firstInterface(void){
 
     Patient *userList = malloc(patientNumber*sizeof(Patient));
 
+    printf("Welcome to the Hospital Management System\n");
+    printf("░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n");
+    printf("░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░████▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n");
+    printf("░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n");
+    printf("░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n");
+    printf("░░░░░░░░░░░░░░░░        ░░░░░░░░░░░░░░░░░░░░░░  ▓▓▓▓▓▓░░░░░░░░▒▒░░░░░░░░░░░░░░░░░░\n");
+    printf("░░░░░░░░░░░░░░░░        ░░░░░░░░░░░░░░░░░░░░░░░░▓▓▓▓░░░░░░░░░░▒▒▒▒▒▒░░░░░░░░░░░░░░\n");
+    printf("░░░░░░░░░░░░░░  ██▓▓▓▓██░░░░░░░░░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓░░░░░░░░▒▒▒▒▒▒░░░░░░░░░░░░░░\n");
+    printf("░░░░░░░░░░░░░░▓▓▓▓▓▓██▓▓▓▓░░░░░░░░░░░░░░░░░░  ▓▓▒▒  ▓▓██░░░░░░▒▒▒▒▒▒░░░░░░░░░░░░░░\n");
+    printf("░░░░      ░░░░        ▒▒▓▓░░░░░░░░▒▒▒▒▒▒░░░░  ▓▓▒▒▓▓▓▓▓▓░░░░░░▒▒░░▒▒░░░░░░░░░░░░░░\n");
+    printf("░░  ▓▓██▓▓░░░░  ▒▒▒▒▒▒░░▓▓░░░░░░░░▒▒▒▒▒▒░░░░  ▓▓░░  ░░▓▓░░░░░░▒▒░░▒▒░░░░░░░░░░░░░░\n");
+    printf("░░░░▓▓▓▓  ░░░░  ░░░░    ▓▓░░░░░░░░  ▒▒▒▒░░░░  ▓▓▒▒▒▒░░▓▓░░░░░░▒▒░░▒▒░░░░          \n");
+    printf("░░░░▒▒▒▒▒▒░░░░  ░░░░    ▓▓░░░░░░░░░░▒▒▒▒░░░░  ▓▓░░    ▓▓░░░░░░▒▒░░▒▒░░░░░░░░░░░░░░\n");
+    printf("░░░░▓▓▓▓▒▒░░░░          ▓▓░░░░░░░░▒▒▒▒░░░░░░  ▓▓░░    ▓▓░░░░▒▒░░░░▒▒▒▒░░░░░░░░  ░░\n");
+    printf("░░░░▒▒▓▓  ░░░░          ▓▓░░░░░░▒▒▒▒▒▒░░░░░░  ▓▓░░    ▓▓░░░░▒▒░░▒▒▒▒▒▒░░░░░░░░  ░░\n");
+    printf("░░░░  ░░░░░░░░  ░░░░░░  ▓▓░░░░▒▒▒▒▒▒▒▒░░░░░░  ▓▓░░▓▓░░▓▓░░░░▒▒░░▒▒▒▒▒▒░░░░░░░░  ░░\n");
+    printf("░░▓▓▒▒▓▓▒▒░░░░▒▒▒▒▒▒████▓▓░░░░▒▒▒▒▒▒▒▒░░░░▒▒░░▓▓▓▓▓▓▒▒██░░░░▒▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░\n");
+
+    printf("Choose your following step: (Write 'back' to return)\n");
     printf("Login\n");
-    printf("Register\n");
+    printf("Register\n--\n");
 
     
     againInput :
