@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <ctype.h>
 
 typedef struct Doctor {
@@ -29,6 +30,7 @@ typedef struct Patient {
 
 
     int age;
+
     char gender[7];
 
     char contactInfo[15];
@@ -42,7 +44,9 @@ typedef struct Patient {
 
 char hospitalPassword[] = "ufaz2026";
 
-void userInterface(void){}
+void userInterface(void){
+    printf("Login successful!\n");
+}
 
 
 void lowercase (char *word){
@@ -55,7 +59,7 @@ void lowercase (char *word){
 
 void firstInterface();
 
-void registerInterface(Patient *userList, int patientNumber){
+void registerInterface(Patient *userList, int *patientNumber){
 
     Patient patient;
 
@@ -78,14 +82,18 @@ void registerInterface(Patient *userList, int patientNumber){
     printf("Enter your contact info: ");
     scanf("%s", patient.contactInfo);
 
-    Patient *temp = realloc(userList, patientNumber*sizeof(Patient));
+    Patient *temp = realloc(userList, (*patientNumber) * sizeof(Patient));
     userList = temp;
-    userList[patientNumber-1] = patient ;
+    userList[(*patientNumber)-1] = patient;
+
+    printf("Registration successful!\n");
+    printf("----------------------\n");
+    firstInterface();
 
 }
 
 
-void loginInterface(Patient *userList, int patientNumber){
+void loginInterface(Patient *userList, int *patientNumber){
     int logincycle = 1;
 
     while(logincycle) {
@@ -107,8 +115,8 @@ void loginInterface(Patient *userList, int patientNumber){
             firstInterface();
         }
 
-        for (int i = 0; i < patientNumber; i++){
-            if (!strcmp(password, userList[patientNumber].password) && !strcmp(contactInfo, userList[patientNumber].contactInfo)){
+        for (int i = 0; i < *patientNumber; i++){
+            if (!strcmp(password, userList[i].password) && !strcmp(contactInfo, userList[i].contactInfo)){
                 logincycle = 0;
                 userInterface();
                 return;
@@ -159,11 +167,11 @@ void firstInterface(void){
     lowercase(choosing);
 
     if (!strcmp(choosing, "login")){
-        loginInterface(userList, patientNumber);
+        loginInterface(userList, &patientNumber);
     }
     else if(!strcmp(choosing, "register")){
-        patientNumber ++;
-        registerInterface(userList, patientNumber);
+        patientNumber += 1;
+        registerInterface(userList, &patientNumber);
     }
     else{
         printf("Invalid opeartion\n");
