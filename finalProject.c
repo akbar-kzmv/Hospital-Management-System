@@ -3,8 +3,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
-//Fix Doctor Login
-//Fix availability to register with number that is already registered*
+/*Failures:
+Fix Doctor Login*
+Fix availability to register with number that is already registered*
+*/
 
 typedef enum Gender {
     Male = 1,
