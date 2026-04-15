@@ -4,6 +4,11 @@
 #include <unistd.h>
 #include <ctype.h>
 
+typedef enum Gender {
+    Male = 1,
+    Female = 2
+} Gender;
+
 typedef struct Doctor {
 
     char name[20];
@@ -42,13 +47,58 @@ typedef struct Patient {
 } Patient;
 
 int patientNumber = 0;
+int doctorNumber = 0;
 
-char hospitalPassword[] = "ufaz2026";
+char hospitalPassword[] = "admin";
 
-void userInterface(void){
-    printf("Login successful!\n");
+void patientInterface(Patient *patient){
+    printf("Welcome, %s\n", (*patient).name);
 }
 
+void hospitalInterface(Patient *userList) {
+    int menu;
+    int submenu;
+
+    for (int i = 0; i < 3; i++) {
+        printf(".");
+        fflush(stdout);
+        sleep(1);
+    }
+    printf("\nSystem accessed\n----------------------\n");
+    printf("Total number of patients in the system: %d\n", patientNumber);
+    printf("Total number of doctors in the system: %d\n----------------------\n", doctorNumber);
+    printf("Choose your action and press proper number:\n");
+    printf("Manage patients (1)\nManage doctors (2)\nManage appointments (3)\nRegister a doctor (4)\nView reports (5)\nManage payments (6)\n");
+    do {
+        scanf("%d", &menu);
+        if (menu < 1 || menu > 6) printf("Invalid number! Choose again!\n");
+    } while(menu > 6 || menu < 1);
+
+    switch (menu) {
+        case 1:
+            for (int i = 0; i < 2; i++) {
+                printf(".");
+                fflush(stdout);
+                sleep(1);
+            }
+            printf("\n----------------------\nView patients (1)\nDelete patient (2)\n");
+            scanf("%d", &submenu);
+
+            if (menu == 1) {
+                for (int i = 0; i < patientNumber; i++) {
+                    printf("Patient #%d\n", i+1);
+                    printf("Name: %s\n", userList[i].name);
+                    printf("Surname: %s\n", userList[i].surname);
+                    printf("Age: %d\n", userList[i].age);
+                    printf("Gender: %s\n", userList[i].gender);
+                    printf("Contact info: %s\n", userList[i].contactInfo);
+                    printf("Password: %s\n", userList[i].password);
+                    //Medical history remains*
+                    printf("----------------------\n");
+                }
+            }
+    }
+}
 
 void lowercase (char *word){
     while(*word){
@@ -74,7 +124,7 @@ void registerInterface(Patient **userList, int patientNumber){
     printf("Enter your age: ");
     scanf("%d", &patient.age);
 
-    printf("Enter gender: ");
+    printf("Enter gender (1 - Male | 2 - Female): ");
     scanf("%s", patient.gender);
 
     printf("Set a password: ");
@@ -87,10 +137,23 @@ void registerInterface(Patient **userList, int patientNumber){
     *userList = temp;
     (*userList)[patientNumber-1] = patient;
 
-    printf("Dear %s, ", (*userList)[patientNumber - 1].name);
+    for (int i = 0; i < 3; i++) {
+        printf(".");
+        fflush(stdout);
+        sleep(1);
+    }
+
+    printf("\nDear %s, ", (*userList)[patientNumber - 1].name);
 
     printf("Registration successful!\n");
-    printf("----------------------\n");
+    
+    printf("Redirecting to main menu");
+    for (int i = 0; i < 3; i++) {
+        printf(".");
+        fflush(stdout);
+        sleep(1);
+    }
+    printf("\n----------------------\n");
     firstInterface(*userList);
 
 }
@@ -117,11 +180,17 @@ void loginInterface(Patient *userList, int patientNumber){
             printf("----------------------\n");
             firstInterface(userList);
         }
+        
+        if (!strcmp(password, hospitalPassword) && !strcmp(contactInfo, "admin")) {
+            logincycle = 0;
+            hospitalInterface(userList);
+            return;
+        }
 
         for (int i = 0; i < patientNumber; i++){
             if (!strcmp(password, userList[i].password) && !strcmp(contactInfo, userList[i].contactInfo)){
                 logincycle = 0;
-                userInterface();
+                patientInterface(&userList[i]);
                 return;
             }
         }
