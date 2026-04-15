@@ -36,7 +36,7 @@ typedef struct Patient {
 
     int age;
 
-    char gender[7];
+    Gender gender;
 
     char contactInfo[15];
 
@@ -50,12 +50,14 @@ int patientNumber = 0;
 int doctorNumber = 0;
 
 char hospitalPassword[] = "admin";
+void registerDoctor (Patient *,Doctor **);
+void firstInterface(Patient *userList, Doctor *doctorList);
 
 void patientInterface(Patient *patient){
     printf("Welcome, %s\n", (*patient).name);
 }
 
-void hospitalInterface(Patient *userList) {
+void hospitalInterface(Patient *userList, Doctor *doctorList) {
     int menu;
     int submenu;
 
@@ -68,11 +70,11 @@ void hospitalInterface(Patient *userList) {
     printf("Total number of patients in the system: %d\n", patientNumber);
     printf("Total number of doctors in the system: %d\n----------------------\n", doctorNumber);
     printf("Choose your action and press proper number:\n");
-    printf("Manage patients (1)\nManage doctors (2)\nManage appointments (3)\nRegister a doctor (4)\nView reports (5)\nManage payments (6)\n");
+    printf("Manage patients (1)\nManage doctors (2)\nManage appointments (3)\nRegister a doctor (4)\nView reports (5)\nManage payments (6)\nExit (7)\n");
     do {
         scanf("%d", &menu);
-        if (menu < 1 || menu > 6) printf("Invalid number! Choose again!\n");
-    } while(menu > 6 || menu < 1);
+        if (menu < 1 || menu > 7) printf("Invalid number! Choose again!\n");
+    } while(menu > 7 || menu < 1);
 
     switch (menu) {
         case 1:
@@ -90,14 +92,66 @@ void hospitalInterface(Patient *userList) {
                     printf("Name: %s\n", userList[i].name);
                     printf("Surname: %s\n", userList[i].surname);
                     printf("Age: %d\n", userList[i].age);
-                    printf("Gender: %s\n", userList[i].gender);
+                    if (userList[i].gender == Male){
+                        printf("Gender: Male\n");
+                    }
+                    else{
+                        printf("Gender: Female\n");
+                    }
+                    
                     printf("Contact info: %s\n", userList[i].contactInfo);
                     printf("Password: %s\n", userList[i].password);
                     //Medical history remains*
                     printf("----------------------\n");
                 }
             }
+        case 4:
+            registerDoctor(userList, &doctorList);      
+        
+        case 7:
+            firstInterface(userList, doctorList);
+        
+
+
+
+
     }
+}
+
+void doctorInterface (Doctor *doctorList){
+    printf("ss");
+}
+
+void registerDoctor (Patient *userList, Doctor **doctorList){
+
+    Doctor doctor;
+
+    doctorNumber++;
+
+    printf("Enter name: ");
+    scanf("%s", doctor.name);
+
+    printf("Enter surname: ");
+    scanf("%s", doctor.surname);
+
+    printf("Enter password: ");
+    scanf("%s", doctor.password);
+
+    printf("Enter specialisation: ");
+    scanf("%s", doctor.specialisation);
+
+    printf("Enter contact info: ");
+    scanf("%s", doctor.contactInfo);
+
+    printf("Time availability: ");
+    scanf("%s", doctor.availability);
+
+    Doctor *temp = realloc(*doctorList, doctorNumber * sizeof(Doctor));
+    *doctorList = temp;
+    (*doctorList)[doctorNumber-1] = doctor;
+
+    hospitalInterface(userList, *doctorList);   
+
 }
 
 void lowercase (char *word){
@@ -108,9 +162,9 @@ void lowercase (char *word){
     }
 }
 
-void firstInterface(Patient *userList);
 
-void registerInterface(Patient **userList, int patientNumber){
+void registerInterface(Patient **userList,Doctor **doctorList, int patientNumber){
+
 
     Patient patient;
 
@@ -125,7 +179,7 @@ void registerInterface(Patient **userList, int patientNumber){
     scanf("%d", &patient.age);
 
     printf("Enter gender (1 - Male | 2 - Female): ");
-    scanf("%s", patient.gender);
+    scanf("%d", &patient.gender);
 
     printf("Set a password: ");
     scanf("%s", patient.password);
@@ -154,12 +208,12 @@ void registerInterface(Patient **userList, int patientNumber){
         sleep(1);
     }
     printf("\n----------------------\n");
-    firstInterface(*userList);
+    firstInterface(*userList, *doctorList);
 
 }
 
 
-void loginInterface(Patient *userList, int patientNumber){
+void loginInterface(Patient *userList, Doctor *doctorList, int patientNumber, int doctorNumber){
     int logincycle = 1;
 
     while(logincycle) {
@@ -169,7 +223,7 @@ void loginInterface(Patient *userList, int patientNumber){
         
         if (!strcmp(contactInfo, "back")) {
             printf("----------------------\n");
-            firstInterface(userList);
+            firstInterface(userList, doctorList);
         }
 
         printf("Enter your password: ");
@@ -178,14 +232,16 @@ void loginInterface(Patient *userList, int patientNumber){
 
         if (!strcmp(password, "back")) {
             printf("----------------------\n");
-            firstInterface(userList);
+            firstInterface(userList, doctorList);
         }
         
         if (!strcmp(password, hospitalPassword) && !strcmp(contactInfo, "admin")) {
             logincycle = 0;
-            hospitalInterface(userList);
+            hospitalInterface(userList, doctorList);
             return;
         }
+
+
 
         for (int i = 0; i < patientNumber; i++){
             if (!strcmp(password, userList[i].password) && !strcmp(contactInfo, userList[i].contactInfo)){
@@ -195,6 +251,15 @@ void loginInterface(Patient *userList, int patientNumber){
             }
         }
 
+        for(int i = 0; i < doctorNumber; i++){
+            if(!strcmp(password, doctorList[i].password) && !strcmp(contactInfo, doctorList[i].contactInfo)){
+                logincycle = 0;
+                doctorInterface(&doctorList[i]);
+                return ;
+            }
+        }
+
+
         printf("Wrong credentials! Try again!\n");
     }
     
@@ -202,7 +267,10 @@ void loginInterface(Patient *userList, int patientNumber){
 }
 
 
-void firstInterface(Patient *userList){
+
+
+
+void firstInterface(Patient *userList, Doctor *doctorList){
     printf("Welcome to the Hospital Management System\n");
     printf("░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n");
     printf("░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░████▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n");
@@ -234,11 +302,11 @@ void firstInterface(Patient *userList){
     lowercase(choosing);
 
     if (!strcmp(choosing, "login")){
-        loginInterface(userList, patientNumber);
+        loginInterface(userList, doctorList, patientNumber, doctorNumber);
     }
     else if(!strcmp(choosing, "register")){
         patientNumber += 1;
-        registerInterface(&userList, patientNumber);
+        registerInterface(&userList,&doctorList, patientNumber);
     }
     else{
         printf("Invalid opeartion\n");
@@ -251,7 +319,17 @@ void firstInterface(Patient *userList){
 int main(void){
     Patient *userList = malloc(patientNumber * sizeof(Patient));
 
-    firstInterface(userList);
+    Doctor *doctorList = malloc(doctorNumber * sizeof(Doctor));
+
+
+    firstInterface(userList, doctorList);
+
+    
+
+
+    free(userList);
+    free(doctorList);
+
 
     return 0;
 }
