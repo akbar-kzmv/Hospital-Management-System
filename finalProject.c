@@ -57,13 +57,13 @@ int doctorNumber = 0;
 
 char hospitalPassword[] = "admin";
 void registerDoctor (Doctor **);
-void firstInterface(Patient *userList, Doctor *doctorList);
+void firstInterface(Patient **userList, Doctor **doctorList);
 
 void patientInterface(Patient *patient){
     printf("Welcome, %s\n", (*patient).name);
 }
 
-void hospitalInterface(Patient *userList, Doctor *doctorList) {
+void hospitalInterface(Patient **userList, Doctor **doctorList) {
     int menu;
     int submenu; 
 
@@ -95,17 +95,17 @@ void hospitalInterface(Patient *userList, Doctor *doctorList) {
                 if (submenu == 1) {
                     for (int i = 0; i < patientNumber; i++) {
                         printf("Patient #%d\n", i+1);
-                        printf("Name: %s\n", userList[i].name);
-                        printf("Surname: %s\n", userList[i].surname);
-                        printf("Age: %d\n", userList[i].age);
-                        if (userList[i].gender == 1) {
+                        printf("Name: %s\n", (*userList)[i].name);
+                        printf("Surname: %s\n", (*userList)[i].surname);
+                        printf("Age: %d\n", (*userList)[i].age);
+                        if ((*userList)[i].gender == 1) {
                             printf("Gender: Male\n");
                         }
-                        else if (userList[i].gender == 2) {
+                        else if ((*userList)[i].gender == 2) {
                             printf("Gender: Female\n");
                         }
-                        printf("Contact info: %s\n", userList[i].contactInfo);
-                        printf("Password: %s\n", userList[i].password);
+                        printf("Contact info: %s\n", (*userList)[i].contactInfo);
+                        printf("Password: %s\n", (*userList)[i].password);
                         //Medical history remains*
                         printf("----------------------\n");
                     }
@@ -123,22 +123,22 @@ void hospitalInterface(Patient *userList, Doctor *doctorList) {
                 if (submenu == 1) {
                     for (int i = 0; i < doctorNumber; i++) {
                         printf("Doctor #%d\n", i+1);
-                        printf("Name: %s\n", doctorList[i].name);
-                        printf("Surname: %s\n", doctorList[i].surname);
-                        printf("Specialisation: %s\n", doctorList[i].specialisation);
-                        printf("Availability: %s\n", doctorList[i].availability);
-                        printf("Contact Info: %s\n", doctorList[i].contactInfo);
-                        printf("Password: %s\n", doctorList[i].password);
+                        printf("Name: %s\n", (*doctorList)[i].name);
+                        printf("Surname: %s\n", (*doctorList)[i].surname);
+                        printf("Specialisation: %s\n", (*doctorList)[i].specialisation);
+                        printf("Availability: %s\n", (*doctorList)[i].availability);
+                        printf("Contact Info: %s\n", (*doctorList)[i].contactInfo);
+                        printf("Password: %s\n", (*doctorList)[i].password);
                         printf("----------------------\n");
                     }
                 }
                 break;
             case 4:
-                registerDoctor(&doctorList);
+                registerDoctor(doctorList);
                 break;
         
             case 7:
-                return;
+             return;
                 break;
         }
     }
@@ -177,6 +177,8 @@ void registerDoctor (Doctor **doctorList){
     Doctor *temp = realloc(*doctorList, doctorNumber * sizeof(Doctor));
     *doctorList = temp;
     (*doctorList)[doctorNumber-1] = doctor;
+
+    
 
     return;   
 
@@ -243,7 +245,7 @@ void registerInterface(Patient **userList, int patientNumber){
 }
 
 
-void loginInterface(Patient *userList, Doctor *doctorList, int patientNumber, int doctorNumber) {
+void loginInterface(Patient **userList, Doctor **doctorList, int patientNumber, int doctorNumber) {
     int logincycle = 1;
 
     while(logincycle) {
@@ -272,18 +274,18 @@ void loginInterface(Patient *userList, Doctor *doctorList, int patientNumber, in
         }
 
         for (int i = 0; i < patientNumber; i++){
-            if (!strcmp(password, userList[i].password) && !strcmp(contactInfo, userList[i].contactInfo)){
+            if (!strcmp(password, (*userList)[i].password) && !strcmp(contactInfo, (*userList)[i].contactInfo)){
                 logincycle = 0;
-                patientInterface(&userList[i]);
+                patientInterface(&(*userList)[i]);
                 return;
             }
         }
 
         for(int i = 0; i < doctorNumber; i++){
-            printf("%s %s", doctorList[i].password, doctorList[i].contactInfo);
-            if (!strcmp(password, doctorList[i].password) && !strcmp(contactInfo, doctorList[i].contactInfo)){
+            printf("%s %s", (*doctorList)[i].password, (*doctorList)[i].contactInfo);
+            if (!strcmp(password, (*doctorList)[i].password) && !strcmp(contactInfo, (*doctorList)[i].contactInfo)){
                 logincycle = 0;
-                doctorInterface(&doctorList[i]);
+                doctorInterface(&(*doctorList)[i]);
                 return;
             }
         }
@@ -296,7 +298,7 @@ void loginInterface(Patient *userList, Doctor *doctorList, int patientNumber, in
 
 
 
-void firstInterface(Patient *userList, Doctor *doctorList){
+void firstInterface(Patient **userList, Doctor **doctorList){
     while(1) {
         printf("Welcome to the Hospital Management System\n");
         printf("░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n");
@@ -333,7 +335,7 @@ void firstInterface(Patient *userList, Doctor *doctorList){
         }
         else if(!strcmp(choosing, "register")){
             patientNumber += 1;
-            registerInterface(&userList, patientNumber);
+            registerInterface(userList, patientNumber);
         }
         else{
             printf("Invalid opeartion\n");
@@ -350,7 +352,7 @@ int main(void){
     Doctor *doctorList = malloc(doctorNumber * sizeof(Doctor));
 
 
-    firstInterface(userList, doctorList);
+    firstInterface(&userList, &doctorList);
 
     
 
