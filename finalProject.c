@@ -129,7 +129,7 @@ void hospitalInterface(Patient **userList, Doctor **doctorList) {
                     fflush(stdout);
                     sleep(1);
                 }
-                printf("\n----------------------\nView patients (1)\nDelete patient (2)\n");
+                printf("\n----------------------\nView patients (1)\nDelete patient (2)\nAssign Doctor(3)");
                 scanf("%d", &submenu);
 
                 if (submenu == 1) {
@@ -174,6 +174,51 @@ void hospitalInterface(Patient **userList, Doctor **doctorList) {
                         } else {
                             printf("There is no patient(s) to delete\n");
                             delete = 0;
+                        }
+                    }
+                }
+                else if(submenu == 3){
+                    char patientName[30];
+                    char doctorName[30];
+
+                    printf("Enter patient's name: ");
+                    scanf("%s", patientName);
+
+                    int patientId = 0;
+                    int doctorId = 0;
+
+
+                    for (int i = 0; i < patientNumber; i++){
+                        if (!strcmp(patientName, (*userList)[i].name)){
+                            printf("Patient: %d", i+1);
+                            printf("Name: %s\n", (*userList)[i].name);
+                            printf("Surname: %s\n",(*userList)[i].surname);
+
+                            printf("----------------------\n");
+
+                        }
+                        printf("Enter ID of patient you want to assign a doctor: ");
+                        scanf("%d", &patientId);
+
+
+                        printf("Enter the name of doctor that you want to assign patient in %d ID: ", patientId);
+                        scanf("%s", doctorName);
+
+
+                        for (int i = 0; i < doctorNumber; i++){
+                            if (!strcmp(doctorName, (*doctorList)[i].name)){
+                                printf("Doctor ID: %d", i+1);
+                                printf("Name: ", (*doctorList)[i].name);
+                                printf("Surname: ", (*doctorList)[i].surname);
+                                printf("Specialisation: %s", (*doctorList)[i].specialisation);
+                                printf("----------------------\n");
+                            }
+
+                            printf("Enter ID of doctor you want to choose: ");
+                            scanf("%d", &doctorId);
+
+                            (*userList)[patientId - 1].assigned_doctor = (*doctorList)[doctorId - 1];
+
                         }
                     }
                 }
@@ -228,6 +273,9 @@ void hospitalInterface(Patient **userList, Doctor **doctorList) {
                     }
                 }
                 break;
+
+            case 3:
+                
             case 4:
                 registerDoctor(doctorList);
                 break;
