@@ -59,6 +59,26 @@ char hospitalPassword[] = "admin";
 void registerDoctor (Doctor **);
 void firstInterface(Patient **userList, Doctor **doctorList);
 
+void userDelete(Patient **userList, int id) {
+    for (int i = 0; i < 2; i++) {
+        printf(".");
+        fflush(stdout);
+        sleep(1);
+    }
+    printf("\n");
+
+    patientNumber -= 1;
+
+    for (int i = id; i < patientNumber; i++) {
+        (*userList)[i] = (*userList)[i+1];
+    }
+
+    Patient *temp = realloc(*userList, patientNumber * sizeof(Patient));
+    *userList = temp;
+
+    printf("Patient deleted successfully\n");
+}
+
 void patientInterface(Patient *patient){
     printf("Welcome, %s\n", (*patient).name);
 }
@@ -108,6 +128,32 @@ void hospitalInterface(Patient **userList, Doctor **doctorList) {
                         printf("Password: %s\n", (*userList)[i].password);
                         //Medical history remains*
                         printf("----------------------\n");
+                    }
+                }
+                else if (submenu == 2) {
+                    int delete = 1, delid;
+                    char delname[30];
+                    while(delete) {
+                        printf("Enter the name of patient you want to delete: ");
+                        scanf("%s", delname);
+                        
+                        if (patientNumber > 0) {
+                            for (int i = 0; i < patientNumber; i++) {
+                                if (!strcmp((*userList)[i].name, delname)) {
+                                    printf("Patient id: %d\n", i+1);
+                                    printf("Patient name: %s\n", (*userList)[i].name);
+                                    printf("Patient surname: %s\n", (*userList)[i].surname);
+                                    printf("----------------------\n");
+                                }
+                            }
+                        
+                            printf("Enter the exact id of patient you want to delete: ");
+                            scanf("%d", &delid);
+                            userDelete(userList, delid - 1);
+                            delete = 0;
+                        } else {
+                            printf("There is no patients to delete\n");
+                        }
                     }
                 }
                 break;
@@ -177,8 +223,6 @@ void registerDoctor (Doctor **doctorList){
     Doctor *temp = realloc(*doctorList, doctorNumber * sizeof(Doctor));
     *doctorList = temp;
     (*doctorList)[doctorNumber-1] = doctor;
-
-    
 
     return;   
 
