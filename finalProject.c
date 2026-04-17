@@ -79,6 +79,26 @@ void userDelete(Patient **userList, int id) {
     printf("Patient deleted successfully\n");
 }
 
+void doctorDelete(Doctor **doctorList, int id) {
+    for (int i = 0; i < 2; i++) {
+        printf(".");
+        fflush(stdout);
+        sleep(1);
+    }
+    printf("\n");
+
+    doctorNumber -= 1;
+
+    for (int i = id; i < doctorNumber; i++) {
+        (*doctorList)[i] = (*doctorList)[i+1];
+    }
+
+    Doctor *temp = realloc(*doctorList, doctorNumber * sizeof(Doctor));
+    *doctorList = temp;
+
+    printf("Doctor deleted successfully\n");
+}
+
 void patientInterface(Patient *patient){
     printf("Welcome, %s\n", (*patient).name);
 }
@@ -152,7 +172,8 @@ void hospitalInterface(Patient **userList, Doctor **doctorList) {
                             userDelete(userList, delid - 1);
                             delete = 0;
                         } else {
-                            printf("There is no patients to delete\n");
+                            printf("There is no patient(s) to delete\n");
+                            delete = 0;
                         }
                     }
                 }
@@ -176,6 +197,34 @@ void hospitalInterface(Patient **userList, Doctor **doctorList) {
                         printf("Contact Info: %s\n", (*doctorList)[i].contactInfo);
                         printf("Password: %s\n", (*doctorList)[i].password);
                         printf("----------------------\n");
+                    }
+                }
+                else if (submenu == 2) {
+                    int delete = 1, delid;
+                    char delname[30];
+                    while(delete) {
+                        printf("Enter the name of doctor you want to delete: ");
+                        scanf("%s", delname);
+                        
+                        if (doctorNumber > 0) {
+                            for (int i = 0; i < doctorNumber; i++) {
+                                if (!strcmp((*doctorList)[i].name, delname)) {
+                                    printf("Doctor id: %d\n", i+1);
+                                    printf("Doctor name: %s\n", (*doctorList)[i].name);
+                                    printf("Doctor surname: %s\n", (*doctorList)[i].surname);
+                                    printf("Doctor specialisation: %s\n", (*doctorList)[i].specialisation);
+                                    printf("----------------------\n");
+                                }
+                            }
+                        
+                            printf("Enter the exact id of doctor you want to delete: ");
+                            scanf("%d", &delid);
+                            doctorDelete(doctorList, delid - 1);
+                            delete = 0;
+                        } else {
+                            printf("There is no doctor(s) to delete\n");
+                            delete = 0;
+                        }
                     }
                 }
                 break;
@@ -227,6 +276,7 @@ void registerDoctor (Doctor **doctorList){
     return;   
 
 }
+
 
 void lowercase (char *word){
     while(*word){
