@@ -52,6 +52,19 @@ typedef struct Patient {
 
 } Patient;
 
+typedef struct Appointment {
+    Patient patient;
+
+    Doctor doctor;
+
+    char service[30];
+
+    char time[10];
+
+    int payment;
+
+} Appointment;
+
 int patientNumber = 0;
 int doctorNumber = 0;
 
@@ -129,7 +142,7 @@ void hospitalInterface(Patient **userList, Doctor **doctorList) {
                     fflush(stdout);
                     sleep(1);
                 }
-                printf("\n----------------------\nView patients (1)\nDelete patient (2)\nAssign Doctor(3)");
+                printf("\n----------------------\nView patients (1)\nDelete patient (2)\nAssign Doctor(3)\n");
                 scanf("%d", &submenu);
 
                 if (submenu == 1) {
@@ -146,6 +159,10 @@ void hospitalInterface(Patient **userList, Doctor **doctorList) {
                         }
                         printf("Contact info: %s\n", (*userList)[i].contactInfo);
                         printf("Password: %s\n", (*userList)[i].password);
+                        if ((*userList)[i].assigned_doctor.name) { //Fix (No doctor assigned) to show
+                            printf("Assigned doctor: Dr. %s\n", (*userList)[i].assigned_doctor.name);
+                        }
+                        else printf("No doctor assigned\n"); 
                         //Medical history remains*
                         printf("----------------------\n");
                     }
@@ -177,11 +194,11 @@ void hospitalInterface(Patient **userList, Doctor **doctorList) {
                         }
                     }
                 }
-                else if(submenu == 3){
+                else if(submenu == 3){ //Fix (if I entered wrong patient/doctor name/id)
                     char patientName[30];
                     char doctorName[30];
 
-                    printf("Enter patient's name: ");
+                    printf("Enter patient's name you want to assign a doctor to: ");
                     scanf("%s", patientName);
 
                     int patientId = 0;
@@ -190,7 +207,7 @@ void hospitalInterface(Patient **userList, Doctor **doctorList) {
 
                     for (int i = 0; i < patientNumber; i++){
                         if (!strcmp(patientName, (*userList)[i].name)){
-                            printf("Patient: %d", i+1);
+                            printf("Patient id: %d\n", i+1);
                             printf("Name: %s\n", (*userList)[i].name);
                             printf("Surname: %s\n",(*userList)[i].surname);
 
@@ -207,10 +224,10 @@ void hospitalInterface(Patient **userList, Doctor **doctorList) {
 
                         for (int i = 0; i < doctorNumber; i++){
                             if (!strcmp(doctorName, (*doctorList)[i].name)){
-                                printf("Doctor ID: %d", i+1);
-                                printf("Name: ", (*doctorList)[i].name);
-                                printf("Surname: ", (*doctorList)[i].surname);
-                                printf("Specialisation: %s", (*doctorList)[i].specialisation);
+                                printf("Doctor ID: %d\n", i+1);
+                                printf("Name: %s\n", (*doctorList)[i].name);
+                                printf("Surname: %s\n", (*doctorList)[i].surname);
+                                printf("Specialisation: %s\n", (*doctorList)[i].specialisation);
                                 printf("----------------------\n");
                             }
 
@@ -219,6 +236,7 @@ void hospitalInterface(Patient **userList, Doctor **doctorList) {
 
                             (*userList)[patientId - 1].assigned_doctor = (*doctorList)[doctorId - 1];
 
+                            printf("Doctor assigned successfully!\n");
                         }
                     }
                 }
@@ -332,7 +350,7 @@ void lowercase (char *word){
         
         word++;
     }
-}
+} //We do not use this function anywhere (except firstInterface). Can be fixed!
 
 
 void registerInterface(Patient **userList, int patientNumber){
@@ -495,9 +513,6 @@ int main(void){
 
 
     firstInterface(&userList, &doctorList);
-
-    
-
 
     free(userList);
     free(doctorList);
