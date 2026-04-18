@@ -59,7 +59,7 @@ typedef struct Appointment {
 
     char service[30];
 
-    char time[10];
+    char time[30];
 
     int payment;
 
@@ -67,10 +67,11 @@ typedef struct Appointment {
 
 int patientNumber = 0;
 int doctorNumber = 0;
+int appNumber = 0;
 
 char hospitalPassword[] = "admin";
 void registerDoctor (Doctor **);
-void firstInterface(Patient **userList, Doctor **doctorList);
+void firstInterface(Patient **userList, Doctor **doctorList, Appointment **appList);
 
 void userDelete(Patient **userList, int id) {
     for (int i = 0; i < 2; i++) {
@@ -299,14 +300,101 @@ void hospitalInterface(Patient **userList, Doctor **doctorList) {
                 break;
         
             case 7:
-             return;
+                return;
                 break;
         }
     }
 }
 
-void doctorInterface (Doctor *doctor){
-    printf("Welcome, dear Dr. %s", (*doctor).name);
+void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList){
+    printf("Welcome, dear Dr. %s\n", (*doctor).name);
+    int menu, submenu;
+    while (1) {
+        printf("\n----------------------\n");
+        printf("Manage your appointments (1)\nSchedule an appointment (2)\nChange your settings (3)\nExit (4)\n");
+        scanf("%d", &menu);
+
+        switch(menu) {
+            case 1:
+                for (int i = 0; i < 2; i++) {
+                    printf(".");
+                    fflush(stdout);
+                    sleep(1);
+                }
+                printf("\n");
+                
+                if (appNumber > 0) {
+                    for (int i = 0; i < appNumber; i++) {
+                        if (!strcmp((*appList)[i].doctor.name, (*doctor).name)) {
+                            printf("Appointment #%d\n", i + 1);
+                            printf("Doctor: Dr. %s\n", (*appList)[i].doctor.name);
+                            printf("Patient: %s\n", (*appList)[i].patient.name);
+                            printf("Service: %s\n", (*appList)[i].service);
+                            printf("Payment: %d₼\n", (*appList)[i].payment);
+                            printf("----------------------\n");
+                        }
+                    }
+                } else printf("No scheduled appointments\n");
+
+                break;
+            case 2:
+                char name[30];
+                int id;
+                printf("Enter the name of patient you want to make an appointment with: ");
+                scanf("%s", name);
+
+                for (int i = 0; i < patientNumber; i++) {
+                    if (!strcmp(name, (*userList)[i].name)) {
+                        printf("Patient id: %d\n", i+1);
+                        printf("Patient name: %s\n",  (*userList)[i].name);
+                        printf("Patient surname: %s\n", (*userList)[i].surname);
+                        printf("----------------------\n");
+                    }
+                }
+
+                printf("Enter the exact id of patient: ");
+                scanf("%d", &id);
+                getchar();
+
+                Appointment app;
+                app.patient = (*userList)[id-1];
+                app.doctor = (*doctor);
+                strcpy(app.service, (*doctor).specialisation);
+                
+                printf("Enter the date/time of appointment: ");
+                fgets(app.time, 30, stdin);
+                app.time[strcspn(app.time, "\n")] = '\0';
+
+                printf("Enter the cost of the service: ");
+                scanf("%d", &app.payment);
+
+                appNumber += 1;
+                Appointment *temp = realloc((*appList), appNumber * sizeof(Appointment));
+                *appList = temp;
+                (*appList)[appNumber - 1] = app;
+
+                for (int i = 0; i < 2; i++) {
+                    printf(".");
+                    fflush(stdout);
+                    sleep(1);
+                }
+
+                printf("\nAppointment scheduled successfully\n");
+
+                for (int i = 0; i < 2; i++) {
+                    printf(".");
+                    fflush(stdout);
+                    sleep(1);
+                }
+
+
+                break;
+
+            case 4:
+                return;
+                break;
+        }
+    }
 }
 
 void registerDoctor (Doctor **doctorList){
@@ -353,7 +441,7 @@ void lowercase (char *word){
 } //We do not use this function anywhere (except firstInterface). Can be fixed!
 
 
-void registerInterface(Patient **userList, int patientNumber){
+void registerInterface(Patient **userList){
 
 
     Patient patient;
@@ -405,7 +493,7 @@ void registerInterface(Patient **userList, int patientNumber){
 }
 
 
-void loginInterface(Patient **userList, Doctor **doctorList, int patientNumber, int doctorNumber) {
+void loginInterface(Patient **userList, Doctor **doctorList, Appointment **appList) {
     int logincycle = 1;
 
     while(logincycle) {
@@ -442,10 +530,9 @@ void loginInterface(Patient **userList, Doctor **doctorList, int patientNumber, 
         }
 
         for(int i = 0; i < doctorNumber; i++){
-            printf("%s %s", (*doctorList)[i].password, (*doctorList)[i].contactInfo);
             if (!strcmp(password, (*doctorList)[i].password) && !strcmp(contactInfo, (*doctorList)[i].contactInfo)){
                 logincycle = 0;
-                doctorInterface(&(*doctorList)[i]);
+                doctorInterface(&(*doctorList)[i], userList, appList);
                 return;
             }
         }
@@ -458,7 +545,7 @@ void loginInterface(Patient **userList, Doctor **doctorList, int patientNumber, 
 
 
 
-void firstInterface(Patient **userList, Doctor **doctorList){
+void firstInterface(Patient **userList, Doctor **doctorList, Appointment **appList){
     while(1) {
         printf("Welcome to the Hospital Management System\n");
         printf("░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n");
@@ -491,11 +578,11 @@ void firstInterface(Patient **userList, Doctor **doctorList){
         lowercase(choosing);
 
         if (!strcmp(choosing, "login")){
-            loginInterface(userList, doctorList, patientNumber, doctorNumber);
+            loginInterface(userList, doctorList, appList);
         }
         else if(!strcmp(choosing, "register")){
             patientNumber += 1;
-            registerInterface(userList, patientNumber);
+            registerInterface(userList);
         }
         else{
             printf("Invalid opeartion\n");
@@ -511,8 +598,10 @@ int main(void){
 
     Doctor *doctorList = malloc(doctorNumber * sizeof(Doctor));
 
+    Appointment *appList = malloc(appNumber * sizeof(Appointment));
 
-    firstInterface(&userList, &doctorList);
+
+    firstInterface(&userList, &doctorList, &appList);
 
     free(userList);
     free(doctorList);
