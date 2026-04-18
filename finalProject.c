@@ -63,11 +63,14 @@ typedef struct Appointment {
 
     int payment;
 
+    int status;
+
 } Appointment;
 
 int patientNumber = 0;
 int doctorNumber = 0;
 int appNumber = 0;
+int WappNumber = 0;
 
 char hospitalPassword[] = "admin";
 void registerDoctor (Doctor **);
@@ -112,6 +115,28 @@ void doctorDelete(Doctor **doctorList, int id) {
 
     printf("Doctor deleted successfully\n");
 }
+
+void appDelete(Appointment **appList, int id) {
+    for (int i = 0; i < 2; i++) {
+        printf(".");
+        fflush(stdout);
+        sleep(1);
+    }
+    printf("\n");
+
+    appNumber -= 1;
+    WappNumber -= 1;
+
+    for (int i = id; i < appNumber; i++) {
+        (*appList)[i] = (*appList)[i+1];
+    }
+
+    Appointment *temp = realloc(*appList, appNumber * sizeof(Appointment));
+    *appList = temp;
+
+    printf("Appointment deleted successfully\n");
+}
+
 
 void patientInterface(Patient *patient){
     printf("Welcome, %s\n", (*patient).name);
@@ -308,9 +333,9 @@ void hospitalInterface(Patient **userList, Doctor **doctorList) {
 
 void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList){
     printf("Welcome, dear Dr. %s\n", (*doctor).name);
-    int menu, submenu;
+    int menu, submenu, appid;
     while (1) {
-        printf("\n----------------------\n");
+        printf("----------------------\n");
         printf("Manage your appointments (1)\nSchedule an appointment (2)\nChange your settings (3)\nExit (4)\n");
         scanf("%d", &menu);
 
@@ -323,9 +348,10 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
                 }
                 printf("\n");
                 
-                if (appNumber > 0) {
+                if (WappNumber > 0) {
+                    printf("Anticipated appointments\n----------------------\n");
                     for (int i = 0; i < appNumber; i++) {
-                        if (!strcmp((*appList)[i].doctor.name, (*doctor).name)) {
+                        if (!strcmp((*appList)[i].doctor.name, (*doctor).name) && (*appList)[i].status == 0) {
                             printf("Appointment #%d\n", i + 1);
                             printf("Doctor: Dr. %s\n", (*appList)[i].doctor.name);
                             printf("Patient: %s\n", (*appList)[i].patient.name);
@@ -334,6 +360,31 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
                             printf("----------------------\n");
                         }
                     }
+
+                    printf("Delete appointment (1)\nMark as done (2)\nChange appointment (3)\n");
+                    scanf("%d", &submenu);
+
+                    switch(submenu) {
+                        case 1:
+                            printf("Enter appointment id you want to delete: ");
+                            scanf("%d", &appid);
+                            appDelete(appList, appid-1);
+                            break;
+
+                        case 2:
+                            printf("Enter appoitment id you want to mark as done: ");
+                            scanf("%d", &appid);
+                            (*appList)[appid - 1].status = 1;
+                            WappNumber -= 1;
+                            printf("----------------------\nAppointment marked as done succesfully\n");
+                            //Here should be billing part*
+                            break;
+                        case 3:
+                            printf("Enter appointment id you want to change: ");
+                            scanf("%d", &appid);
+                            break;
+                    }
+
                 } else printf("No scheduled appointments\n");
 
                 break;
@@ -368,7 +419,10 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
                 printf("Enter the cost of the service: ");
                 scanf("%d", &app.payment);
 
+                app.status = 0;
+
                 appNumber += 1;
+                WappNumber += 1;
                 Appointment *temp = realloc((*appList), appNumber * sizeof(Appointment));
                 *appList = temp;
                 (*appList)[appNumber - 1] = app;
