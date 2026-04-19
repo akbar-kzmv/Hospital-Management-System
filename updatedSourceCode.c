@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <ctype.h>
 
-//Fix availability to register with number that is already registered* 
+
 //Fix in ALL cases -> error showing if I enter incorrect username/doctorname and so on*
 
 typedef enum Gender {
