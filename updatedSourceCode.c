@@ -759,8 +759,20 @@ void registerInterface(Patient **userList){
     printf("Set a password: ");
     scanf("%s", patient.password);
 
-    printf("Enter your contact info: ");
-    scanf("%s", patient.contactInfo);
+    while(1) {
+        int restatus = 0;
+        printf("Enter your contact info: ");
+        scanf("%s", patient.contactInfo);
+
+        for (int i = 0; i < patientNumber; i++) {
+            if (!strcmp(patient.contactInfo, (*userList)[i].contactInfo)) {
+                printf("Number is already registered!\n");
+                restatus = 1;
+                break;
+            }
+        }
+        if (!restatus) break;
+    }
 
     Patient *temp = realloc(*userList, patientNumber * sizeof(Patient));
     *userList = temp;
