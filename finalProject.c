@@ -354,8 +354,9 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
                         if (!strcmp((*appList)[i].doctor.name, (*doctor).name) && (*appList)[i].status == 0) {
                             printf("Appointment #%d\n", i + 1);
                             printf("Doctor: Dr. %s\n", (*appList)[i].doctor.name);
-                            printf("Patient: %s\n", (*appList)[i].patient.name);
+                            printf("Patient: %s %s\n", (*appList)[i].patient.name, (*appList)[i].patient.surname);
                             printf("Service: %s\n", (*appList)[i].service);
+                            printf("Date: %s\n", (*appList)[i].time);
                             printf("Payment: %d₼\n", (*appList)[i].payment);
                             printf("----------------------\n");
                         }
@@ -382,6 +383,63 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
                         case 3:
                             printf("Enter appointment id you want to change: ");
                             scanf("%d", &appid);
+
+                            for (int i = 0; i < 2; i++) {
+                                printf(".");
+                                fflush(stdout);
+                                sleep(1);
+                            }
+                            printf("\n");
+                            printf("Enter '1' if you want to change and '0' if you do not want to change\n");
+                            int ch;
+                            printf("Patient: %s %s | Change? ", (*appList)[appid - 1].patient.name, (*appList)[appid - 1].patient.surname);
+                            scanf("%d", &ch);
+                            if (ch) {
+                                char name[30];
+                                int id;
+                                printf("Enter the name of patient you want to make an appointment with: ");
+                                scanf("%s", name);
+
+                                for (int i = 0; i < patientNumber; i++) {
+                                    if (!strcmp(name, (*userList)[i].name)) {
+                                        printf("Patient id: %d\n", i+1);
+                                        printf("Patient name: %s\n",  (*userList)[i].name);
+                                        printf("Patient surname: %s\n", (*userList)[i].surname);
+                                        printf("----------------------\n");
+                                    }
+                                }
+
+                                printf("Enter the exact id of patient: ");
+                                scanf("%d", &id);
+                                (*appList)[appid - 1].patient = (*userList)[id-1];
+                                printf(".\n");
+                                
+                            }
+                            printf("Date: %s | Change? ", (*appList)[appid - 1].time);
+                            scanf("%d", &ch);
+                            if (ch) {
+                                getchar();
+                                printf("Enter new time for the appointment: ");
+                                fgets((*appList)[appid - 1].time, 30, stdin);
+                                (*appList)[appid - 1].time[strcspn((*appList)[appid - 1].time, "\n")] = '\0';
+                                printf(".\n");
+                            }
+                            printf("Payment: %d₼ | Change? ", (*appList)[appid - 1].payment);
+                            scanf("%d", &ch);
+                            if (ch) {
+                                printf("Enter new cost of the service: ");
+                                scanf("%d", &(*appList)[appid - 1].payment);
+                                printf(".\n");
+                            }
+
+                            for (int i = 0; i < 3; i++) {
+                                printf(".");
+                                fflush(stdout);
+                                sleep(1);
+                            }
+                            printf("\nChanges applied succesfully\n");
+                            printf(".\n");
+
                             break;
                     }
 
