@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <ctype.h>
 
-//Fix availability to register with number that is already registered*
+//Fix availability to register with number that is already registered* 
 //Fix in ALL cases -> error showing if I enter incorrect username/doctorname and so on*
 
 typedef enum Gender {
@@ -73,7 +73,7 @@ int appNumber = 0;
 int WappNumber = 0;
 
 char hospitalPassword[] = "admin";
-void registerDoctor (Doctor **);
+void registerDoctor (Doctor **, Patient **);
 void firstInterface(Patient **userList, Doctor **doctorList, Appointment **appList);
 
 void userDelete(Patient **userList, int id) {
@@ -525,7 +525,7 @@ void hospitalInterface(Patient **userList, Doctor **doctorList, Appointment **ap
 
                 break;
             case 4:
-                registerDoctor(doctorList);
+                registerDoctor(doctorList, userList);
                 break;
         
             case 7:
@@ -712,10 +712,10 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
     }
 }
 
-void registerDoctor (Doctor **doctorList){
+void registerDoctor (Doctor **doctorList, Patient **userList){
 
     Doctor doctor;
-
+    char doctorContactInfo[30];
     doctorNumber++;
 
     printf("Enter name: ");
@@ -730,9 +730,43 @@ void registerDoctor (Doctor **doctorList){
     printf("Enter specialisation: ");
     scanf("%s", doctor.specialisation);
 
+    while(1){
+        int sameNumberCount = 0;
+    
     printf("Enter contact info: ");
-    scanf("%s", doctor.contactInfo);
+    scanf("%s", doctorContactInfo);
+    //getchar();                    why you have used getchar here?
+
+    for (int i = 0; i < doctorNumber; i++){
+        if (!strcmp(doctorContactInfo, (*doctorList)[i].contactInfo)){
+            printf("Number already taken!\n");
+            sameNumberCount++;
+            break;
+        }
+    
+        if (i == doctorNumber - 1){
+            for (int j = 0; j < patientNumber; j++){
+                if (!strcmp(doctorContactInfo, (*userList)[j].contactInfo)){
+                printf("This number already taken!\n");
+                sameNumberCount++;
+                break;
+                }
+            }   
+        }
+        
+    }
+    if (sameNumberCount == 0){
+        strcpy(doctor.contactInfo, doctorContactInfo);
+        break;
+    }
+
+    }
     getchar();
+    
+
+
+
+
 
     printf("Time availability: ");
     fgets(doctor.availability, 30, stdin);
@@ -756,12 +790,13 @@ void lowercase (char *word){
 } //We do not use this function anywhere (except firstInterface). Can be fixed!
 
 
-void registerInterface(Patient **userList){
+void registerInterface(Patient **userList, Doctor **doctorList){
 
 
     Patient patient;
     int gnd;
-
+    char patientContactInfo[15];
+   
 
     printf("Enter name: ");
     scanf("%s", patient.name);
@@ -779,8 +814,37 @@ void registerInterface(Patient **userList){
     printf("Set a password: ");
     scanf("%s", patient.password);
 
+    while (1){
+    int sameNumberCount = 0;
+
     printf("Enter your contact info: ");
-    scanf("%s", patient.contactInfo);
+    scanf("%s", patientContactInfo);
+
+    for(int i = 0; i < patientNumber; i++){
+        if(!strcmp(patientContactInfo, (*userList)[i].contactInfo)){
+            printf("This number already taken!\n");
+            sameNumberCount++;
+            break;
+            
+        }
+        if (i == patientNumber - 1){
+            for (int j = 0; j < doctorNumber; j++){
+                if (!strcmp(patientContactInfo, (*doctorList)[j].contactInfo)){
+                printf("This number already taken!\n");
+                sameNumberCount++;
+                break;
+                }
+            }   
+        }
+        
+    }
+    if (sameNumberCount == 0){
+        strcpy(patient.contactInfo, patientContactInfo);
+        break;
+    }
+
+
+    }
 
     Patient *temp = realloc(*userList, patientNumber * sizeof(Patient));
     *userList = temp;
@@ -897,7 +961,7 @@ void firstInterface(Patient **userList, Doctor **doctorList, Appointment **appLi
         }
         else if(!strcmp(choosing, "register")){
             patientNumber += 1;
-            registerInterface(userList);
+            registerInterface(userList, doctorList);
         }
         else{
             printf("Invalid opeartion\n");
