@@ -189,12 +189,11 @@ void patientInterface(Patient *patient){
 
     case 2:
         printf("---------------\n");
-        if((*patient).med_history){
-            printf("%s", (*patient).med_history); // MED HISTORY PRINTING
-
+        if (&(*patient).med_history == NULL || patient->med_history[0] == '\0') {
+            printf("Empty\n");
         }
         else{
-            printf("Empty\n");
+            printf("%s", (*patient).med_history); 
         }
         break;
     case 3:
