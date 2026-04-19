@@ -753,6 +753,11 @@ void registerDoctor (Doctor **doctorList, Patient **userList){
                 }
             }   
         }
+        else if (!strcmp(doctorContactInfo, "admin")){
+            printf("You are not authorized!\n");
+            sameNumberCount++;
+            break;
+        }
         
     }
     if (sameNumberCount == 0){
@@ -835,6 +840,11 @@ void registerInterface(Patient **userList, Doctor **doctorList){
                 break;
                 }
             }   
+        }
+        else if (!strcmp(patientContactInfo, "admin")){
+            printf("You are not authorized!\n");
+            sameNumberCount++;
+            break;
         }
         
     }
