@@ -731,7 +731,7 @@ void registerDoctor (Doctor **doctorList, Patient **userList){
     scanf("%s", doctor.specialisation);
 
     while(1){
-        int sameNumberCount = 0;
+        int restatus = 0;
     
     printf("Enter contact info: ");
     scanf("%s", doctorContactInfo);
@@ -740,7 +740,7 @@ void registerDoctor (Doctor **doctorList, Patient **userList){
     for (int i = 0; i < doctorNumber; i++){
         if (!strcmp(doctorContactInfo, (*doctorList)[i].contactInfo)){
             printf("Number already taken!\n");
-            sameNumberCount++;
+            restatus = 1;
             break;
         }
     
@@ -748,19 +748,19 @@ void registerDoctor (Doctor **doctorList, Patient **userList){
             for (int j = 0; j < patientNumber; j++){
                 if (!strcmp(doctorContactInfo, (*userList)[j].contactInfo)){
                 printf("This number already taken!\n");
-                sameNumberCount++;
+                restatus = 1;
                 break;
                 }
             }   
         }
         else if (!strcmp(doctorContactInfo, "admin")){
             printf("You are not authorized!\n");
-            sameNumberCount++;
+            restatus = 1;
             break;
         }
         
     }
-    if (sameNumberCount == 0){
+    if (restatus == 0){
         strcpy(doctor.contactInfo, doctorContactInfo);
         break;
     }
@@ -820,7 +820,7 @@ void registerInterface(Patient **userList, Doctor **doctorList){
     scanf("%s", patient.password);
 
     while (1){
-    int sameNumberCount = 0;
+    int restatus = 0;
 
     printf("Enter your contact info: ");
     scanf("%s", patientContactInfo);
@@ -828,7 +828,7 @@ void registerInterface(Patient **userList, Doctor **doctorList){
     for(int i = 0; i < patientNumber; i++){
         if(!strcmp(patientContactInfo, (*userList)[i].contactInfo)){
             printf("This number already taken!\n");
-            sameNumberCount++;
+            restatus = 1;
             break;
             
         }
@@ -836,19 +836,19 @@ void registerInterface(Patient **userList, Doctor **doctorList){
             for (int j = 0; j < doctorNumber; j++){
                 if (!strcmp(patientContactInfo, (*doctorList)[j].contactInfo)){
                 printf("This number already taken!\n");
-                sameNumberCount++;
+                restatus = 1;
                 break;
                 }
             }   
         }
         else if (!strcmp(patientContactInfo, "admin")){
             printf("You are not authorized!\n");
-            sameNumberCount++;
+            restatus = 1;
             break;
         }
         
     }
-    if (sameNumberCount == 0){
+    if (restatus == 0){
         strcpy(patient.contactInfo, patientContactInfo);
         break;
     }
