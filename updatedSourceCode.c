@@ -358,7 +358,7 @@ void hospitalInterface(Patient **userList, Doctor **doctorList, Appointment **ap
                         }
                     }
                 }
-                else if(submenu == 3){ //Fix (if I entered wrong patient/doctor name/id)    000000 FIXED
+                else if(submenu == 3) { //Fix (if I entered wrong patient/doctor name/id)    000000 FIXED
                     char patientName[30];
                     char doctorName[30];
                     int patientId = 0;
@@ -367,84 +367,86 @@ void hospitalInterface(Patient **userList, Doctor **doctorList, Appointment **ap
                     //Should be fixed
                     int isTherePatient = 0;
 
-                    while (!isTherePatient){ // fixed wrong patient
-                    printf("Enter patient's name you want to assign a doctor to: ");
-                    scanf("%s", patientName);
+                    while (!isTherePatient){
+                        printf("Enter patient's name you want to assign a doctor to: ");
+                        scanf("%s", patientName);
 
 
 
-                    for (int i = 0; i < patientNumber; i++){
-                        if (!strcmp(patientName, (*userList)[i].name)){
-                            isTherePatient ++;
-                            printf("Patient id: %d\n", i+1);
-                            printf("Name: %s\n", (*userList)[i].name);
-                            printf("Surname: %s\n",(*userList)[i].surname);
+                        for (int i = 0; i < patientNumber; i++){
+                            if (!strcmp(patientName, (*userList)[i].name)){
+                                printf("Patient id: %d\n", i+1);
+                                printf("Name: %s\n", (*userList)[i].name);
+                                printf("Surname: %s\n",(*userList)[i].surname);
+                                isTherePatient = 1;
 
-                            printf("----------------------\n");
+                                printf("----------------------\n");
 
+                            }
+                            
+                        }
+
+                        if (!isTherePatient){
+                            printf("There is no such patient\n");
+                            sleep(1);
+                            printf("Do you want to exit? |YES| or |NO|");
+                            char yesOrNo[4];
+                            scanf("%s", yesOrNo);
+
+                            if (!strcmp(yesOrNo,"NO")){
+                                isTherePatient = 0;
+                            }
+                            else if (!strcmp(yesOrNo, "YES")) {
+                                isTherePatient = 1;
+                            }
+                        }
+
+                        if (!isTherePatient) {
+                            printf("Enter ID of patient you want to assign a doctor: ");
+                            scanf("%d", &patientId);
+
+                            
+                            int isThereDoctor = 0;
+
+                            printf("Enter the name of doctor that you want to assign patient in %d ID: ", patientId);
+                            scanf("%s", doctorName);
+                    
+
+                            for (int i = 0; i < doctorNumber; i++){
+                                if (!strcmp(doctorName, (*doctorList)[i].name)){
+                                    isThereDoctor++;
+                                    printf("Doctor ID: %d\n", i+1);
+                                    printf("Name: %s\n", (*doctorList)[i].name);
+                                    printf("Surname: %s\n", (*doctorList)[i].surname);
+                                    printf("Specialisation: %s\n", (*doctorList)[i].specialisation);
+                                    printf("----------------------\n");
+                                }
+                            }
+                            if (!isThereDoctor){
+                                printf("There is no such a doctor\n");
+                                sleep(1);
+                                printf("Do you want to exit? |YES| or |NO|");
+                                char yesOrNo[4];
+                                scanf("%s", yesOrNo);
+
+                                if (!strcmp(yesOrNo,"NO")){
+                                    isThereDoctor = 0;
+                                }
+                                else if (!strcmp(yesOrNo, "YES")) {
+                                    isThereDoctor = 1;
+                                }
+                            }
+
+                            if (!isThereDoctor) {
+                                printf("Enter ID of doctor you want to choose: ");
+                                scanf("%d", &doctorId);
+
+                                (*userList)[patientId - 1].assigned_doctor = (*doctorList)[doctorId - 1];
+
+                                printf("Doctor assigned successfully!\n");
+                            }
                         }
                     }
-                    if (!isTherePatient){
-                        printf("There is no such a patient\n");
-                        sleep(1);
-                        printf("Do you want to exit? |YES| or |NO|");
-                        char yesOrNo[4];
-                        scanf("%s", yesOrNo);
-
-                        if (!strcmp(yesOrNo,"NO")){
-                            isTherePatient = 0;
-                        }
-                        else if (!strcmp(yesOrNo, "YES")) {
-                            isTherePatient = 1;
-                        }
-                    }
-                }
-
-                    printf("Enter ID of patient you want to assign a doctor: ");
-                    scanf("%d", &patientId);
-
-                    int isThereDoctor = 0;
-
-
-                    while(!isThereDoctor){
-                    printf("Enter the name of doctor that you want to assign patient in %d ID: ", patientId);
-                    scanf("%s", doctorName);
-
-
-                    for (int i = 0; i < doctorNumber; i++){
-                        if (!strcmp(doctorName, (*doctorList)[i].name)){
-                            isThereDoctor++;
-                            printf("Doctor ID: %d\n", i+1);
-                            printf("Name: %s\n", (*doctorList)[i].name);
-                            printf("Surname: %s\n", (*doctorList)[i].surname);
-                            printf("Specialisation: %s\n", (*doctorList)[i].specialisation);
-                            printf("----------------------\n");
-                        }
-                    }
-                     if (!isThereDoctor){
-                        printf("There is no such a doctor\n");
-                        sleep(1);
-                        printf("Do you want to exit? |YES| or |NO|");
-                        char yesOrNo[4];
-                        scanf("%s", yesOrNo);
-
-                        if (!strcmp(yesOrNo,"NO")){
-                            isThereDoctor = 0;
-                        }
-                        else{
-                            isThereDoctor = 1;
-                        }
-                    }
-
-
-                }
-
-                    printf("Enter ID of doctor you want to choose: ");
-                    scanf("%d", &doctorId);
-
-                    (*userList)[patientId - 1].assigned_doctor = (*doctorList)[doctorId - 1];
-
-                    printf("Doctor assigned successfully!\n");
                 }
                 break;
             case 2:
@@ -731,7 +733,7 @@ void registerDoctor (Doctor **doctorList, Patient **userList){
     scanf("%s", doctor.specialisation);
 
     while(1){
-        int restatus = 0;
+        int sameNumberCount = 0;
     
     printf("Enter contact info: ");
     scanf("%s", doctorContactInfo);
@@ -740,7 +742,7 @@ void registerDoctor (Doctor **doctorList, Patient **userList){
     for (int i = 0; i < doctorNumber; i++){
         if (!strcmp(doctorContactInfo, (*doctorList)[i].contactInfo)){
             printf("Number already taken!\n");
-            restatus = 1;
+            sameNumberCount++;
             break;
         }
     
@@ -748,19 +750,19 @@ void registerDoctor (Doctor **doctorList, Patient **userList){
             for (int j = 0; j < patientNumber; j++){
                 if (!strcmp(doctorContactInfo, (*userList)[j].contactInfo)){
                 printf("This number already taken!\n");
-                restatus = 1;
+                sameNumberCount++;
                 break;
                 }
             }   
         }
         else if (!strcmp(doctorContactInfo, "admin")){
             printf("You are not authorized!\n");
-            restatus = 1;
+            sameNumberCount++;
             break;
         }
         
     }
-    if (restatus == 0){
+    if (sameNumberCount == 0){
         strcpy(doctor.contactInfo, doctorContactInfo);
         break;
     }
@@ -820,7 +822,7 @@ void registerInterface(Patient **userList, Doctor **doctorList){
     scanf("%s", patient.password);
 
     while (1){
-    int restatus = 0;
+    int sameNumberCount = 0;
 
     printf("Enter your contact info: ");
     scanf("%s", patientContactInfo);
@@ -828,7 +830,7 @@ void registerInterface(Patient **userList, Doctor **doctorList){
     for(int i = 0; i < patientNumber; i++){
         if(!strcmp(patientContactInfo, (*userList)[i].contactInfo)){
             printf("This number already taken!\n");
-            restatus = 1;
+            sameNumberCount++;
             break;
             
         }
@@ -836,19 +838,19 @@ void registerInterface(Patient **userList, Doctor **doctorList){
             for (int j = 0; j < doctorNumber; j++){
                 if (!strcmp(patientContactInfo, (*doctorList)[j].contactInfo)){
                 printf("This number already taken!\n");
-                restatus = 1;
+                sameNumberCount++;
                 break;
                 }
             }   
         }
         else if (!strcmp(patientContactInfo, "admin")){
             printf("You are not authorized!\n");
-            restatus = 1;
+            sameNumberCount++;
             break;
         }
         
     }
-    if (restatus == 0){
+    if (sameNumberCount == 0){
         strcpy(patient.contactInfo, patientContactInfo);
         break;
     }
