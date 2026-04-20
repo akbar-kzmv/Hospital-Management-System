@@ -367,7 +367,7 @@ void hospitalInterface(Patient **userList, Doctor **doctorList, Appointment **ap
                     //Should be fixed
                     int isTherePatient = 0;
 
-                    while (!isTherePatient){
+                    while (!isTherePatient) {
                         printf("Enter patient's name you want to assign a doctor to: ");
                         scanf("%s", patientName);
 
@@ -397,11 +397,11 @@ void hospitalInterface(Patient **userList, Doctor **doctorList, Appointment **ap
                                 isTherePatient = 0;
                             }
                             else if (!strcmp(yesOrNo, "YES")) {
-                                isTherePatient = 1;
+                                break;
                             }
                         }
 
-                        if (!isTherePatient) {
+                        if (isTherePatient) {
                             printf("Enter ID of patient you want to assign a doctor: ");
                             scanf("%d", &patientId);
 
@@ -433,11 +433,11 @@ void hospitalInterface(Patient **userList, Doctor **doctorList, Appointment **ap
                                     isThereDoctor = 0;
                                 }
                                 else if (!strcmp(yesOrNo, "YES")) {
-                                    isThereDoctor = 1;
+                                    break;
                                 }
                             }
 
-                            if (!isThereDoctor) {
+                            if (isThereDoctor) {
                                 printf("Enter ID of doctor you want to choose: ");
                                 scanf("%d", &doctorId);
 
