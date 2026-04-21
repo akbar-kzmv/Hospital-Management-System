@@ -9,7 +9,6 @@
 
 typedef struct Appointment Appointment;
 
-
 typedef enum Gender {
 
     Male = 1,
@@ -17,6 +16,7 @@ typedef enum Gender {
     Female = 2
 
 } Gender;
+
 
 typedef struct Doctor {
 
@@ -30,9 +30,11 @@ typedef struct Doctor {
     char contactInfo[15];
 
     char availability[30];
-    
 
-} Doctor ;
+    int doctorBalance;
+        
+
+} Doctor;
 
 
 typedef struct Patient {
@@ -60,6 +62,13 @@ typedef struct Patient {
 
 } Patient;
 
+typedef struct Feedback {
+    Patient patient;
+
+    char text[300];
+
+} Feedback;
+
 typedef struct Appointment {
     Patient patient;
 
@@ -73,16 +82,21 @@ typedef struct Appointment {
 
     int status;
 
+    int payed;
+
 } Appointment;
 
 int patientNumber = 0;
 int doctorNumber = 0;
 int appNumber = 0;
 int WappNumber = 0;
+int fedNumber = 0;
+
+int hospitalIncome = 0;
 
 char hospitalPassword[] = "admin";
 void registerDoctor (Doctor **, Patient **);
-void firstInterface(Patient **userList, Doctor **doctorList, Appointment **appList);
+void firstInterface(Patient **userList, Doctor **doctorList, Appointment **appList, Feedback **fedList);
 
 void userDelete(Patient **userList, int id) {
     for (int i = 0; i < 2; i++) {
@@ -146,10 +160,8 @@ void appDelete(Appointment **appList, int id) {
 }
 
 
-void patientInterface(Patient *patient, Appointment **appList){
+void patientInterface(Patient *patient, Appointment **appList, Feedback **fedList){
     printf("Welcome, %s\n", (*patient).name);
-   
-        
 
     while(1){
 
@@ -157,7 +169,7 @@ void patientInterface(Patient *patient, Appointment **appList){
     printf("MAIN MENU\n");
     printf("---------------\n");
 
-    printf("Patient Info (1)\nMedical History (2)\nMy Appointments(3)\nChange Personal Info(4)\nExit(5)\n");
+    printf("Patient Info (1)\nMedical History (2)\nMy Appointments (3)\nChange Personal Info (4)\nWrite a report (5)\nPay the service (6)\nExit (7)\n");
 
     printf("Enter the submenu number: ");
     int subMenu;
@@ -177,10 +189,10 @@ void patientInterface(Patient *patient, Appointment **appList){
         printf("Name: %s\n", (*patient).name);
         printf("Surname: %s\n", (*patient).surname);
         printf("Age: %d\n", (*patient).age);
-        if ((*patient).gender == 1){
+        if ((*patient).gender == 1) {
             printf("Gender: Male\n");
         }
-        else{
+        else {
             printf("Gender: Female\n");
         }
         printf("Contact info: %s\n", (*patient).contactInfo);
@@ -239,7 +251,7 @@ void patientInterface(Patient *patient, Appointment **appList){
 
         printf("Your appointments: \n");
         for (int i = 0; i < appNumber; i++) {
-            if (!strcmp((*appList)[i].patient.name, (*patient).name)) {
+            if ((!strcmp((*appList)[i].patient.name, (*patient).name)) && (*appList)[i].patient.med_history->status == 0) {
                 printf("Appoinment #%d\n", i + 1);
                 printf("Doctor: Dr. %s %s\n",(*appList)[i].doctor.name, (*appList)[i].doctor.surname);
                 printf("Service: %s\n", (*appList)[i].service);
@@ -265,8 +277,8 @@ void patientInterface(Patient *patient, Appointment **appList){
         while(1){
         printf("---------------\n");
         printf("Change your password (1)\n");
-        printf("Change your contact info(2)\n");
-        printf("Back to previous menu(3)\n");
+        printf("Change your contact info (2)\n");
+        printf("Back to previous menu (3)\n");
         printf("---------------\n");
 
         printf("Choose one submenu: ");
@@ -313,6 +325,51 @@ void patientInterface(Patient *patient, Appointment **appList){
         }
         break;
     case 5:
+        Feedback feedback;
+        getchar();
+        printf("We value your feedback! Write your thoughts, advices or complaints: ");
+        fgets(feedback.text, 300, stdin);
+        feedback.text[strcspn(feedback.text, "\n")] = '\0';
+        feedback.patient = (*patient);
+        
+        fedNumber++;
+
+        Feedback *temp = realloc((*fedList), fedNumber * sizeof(Feedback));
+        (*fedList) = temp;
+        (*fedList)[fedNumber - 1] = feedback;
+        
+        break;
+    case 6:
+        for (int i = 0; i < (*patient).DappNumber; i++){
+            if ((*patient).med_history[i].payed == 0) {
+                printf("---------------\n");
+                printf("Appointment ID %d\n", i + 1);
+                printf("Name/Surname: %s %s\n", (*patient).name, (*patient).surname);
+                printf("Doctor: Dr. %s %s\n", (*patient).med_history[i].doctor.name, (*patient).med_history[i].doctor.surname);
+                printf("Service: %s\n", (*patient).med_history[i].doctor.specialisation);
+                printf("Date: %s\n",(*patient).med_history[i].time);
+                printf("Payment: %d₼\n", (*patient).med_history[i].payment);            
+            }          
+        }
+        printf("Choose ID of appointment you want to pay: "); 
+        int payID;
+        scanf("%d", &payID);
+
+        printf("---------------\n");
+        for (int i = 0; i < 2; i++) {
+            printf(".");
+            fflush(stdout);
+            sleep(1);
+        }
+        printf("\n");
+         
+        (*patient).med_history[payID - 1].payed = 1;
+        (*patient).med_history[payID - 1].doctor.doctorBalance += ((*patient).med_history[payID - 1].payment)*0.8;
+        hospitalIncome += ((*patient).med_history[payID - 1].payment)*0.2;
+        printf("Payment successful\n");
+               
+        break;
+    case 7:
         return;
         break;
     }
@@ -322,7 +379,7 @@ void patientInterface(Patient *patient, Appointment **appList){
 
 }
 
-void hospitalInterface(Patient **userList, Doctor **doctorList, Appointment **appList) {
+void hospitalInterface(Patient **userList, Doctor **doctorList, Appointment **appList, Feedback **fedList) {
     int menu;
     int submenu; 
 
@@ -335,7 +392,7 @@ void hospitalInterface(Patient **userList, Doctor **doctorList, Appointment **ap
         printf("\nTotal number of patients in the system: %d\n", patientNumber);
         printf("Total number of doctors in the system: %d\n----------------------\n", doctorNumber);
         printf("Choose your action and press proper number:\n");
-        printf("Manage patients (1)\nManage doctors (2)\nManage appointments (3)\nRegister a doctor (4)\nView reports (5)\nManage payments (6)\nExit (7)\n");
+        printf("Manage patients (1)\nManage doctors (2)\nManage appointments (3)\nRegister a doctor (4)\nView feedbacks (5)\nManage payments (6)\nGenerate reports (7)\nExit (8)");
         do {
             scanf("%d", &menu);
             if (menu < 1 || menu > 7) printf("Invalid number! Choose again!\n");
@@ -348,7 +405,7 @@ void hospitalInterface(Patient **userList, Doctor **doctorList, Appointment **ap
                     fflush(stdout);
                     sleep(1);
                 }
-                printf("\n----------------------\nView patients (1)\nDelete patient (2)\nAssign Doctor(3)\n");
+                printf("\n----------------------\nView patients (1)\nDelete patient (2)\nAssign Doctor(3)\n"); //Exit (4)
                 scanf("%d", &submenu);
 
                 if (submenu == 1) {
@@ -497,7 +554,7 @@ void hospitalInterface(Patient **userList, Doctor **doctorList, Appointment **ap
                     fflush(stdout);
                     sleep(1);
                 }
-                printf("\n----------------------\nView doctors (1)\nDelete doctor (2)\n");
+                printf("\n----------------------\nView doctors (1)\nDelete doctor (2)\n"); //Exit(3)
                 scanf("%d", &submenu);
 
                 if (submenu == 1) {
@@ -566,13 +623,53 @@ void hospitalInterface(Patient **userList, Doctor **doctorList, Appointment **ap
                         }
                     }
                 }
-
+                
                 break;
             case 4:
                 registerDoctor(doctorList, userList);
                 break;
-        
+                
+            case 5:
+                printf("Reports: \n");
+
+                for (int i = 0; i < fedNumber; i++) {
+                    printf("%s | %s %s\n\n", (*fedList)[i].text, (*fedList)[i].patient.name, (*fedList)[i].patient.surname);
+                }
+                
+                break;
             case 7:
+                while (1){
+                    int choose;
+                    printf("Report sections: \n");
+                    printf("----------------------\n");
+                    printf("Patient Report (1)\n");
+                    printf("Doctor Report (2)\n");
+                    printf("Revenue Report (3)\n");
+
+                    scanf("%d", &choose);
+                    
+                    if (choose == 1){
+                        userReport(userList);
+                        
+                    }
+                    else if(choose == 2){
+                        doctorReport(doctorList);
+                    }
+                    else if(choose == 3){
+                        revenueReport(doctorList);
+                    }
+                    printf("----------------------\n");              
+
+                    printf("Back to previous menu (4)\n");
+                    int backToPreviousMenu;
+                    scanf("%d", &backToPreviousMenu);
+                    if (backToPreviousMenu == 4){
+                        break;
+                    }
+                }
+                
+                break;
+            case 8:
                 return;
                 break;
         }
@@ -584,7 +681,7 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
     int menu, submenu, appid;
     while (1) {
         printf("----------------------\n");
-        printf("Manage your appointments (1)\nSchedule an appointment (2)\nChange your settings (3)\nView your patients - assigned to you (4)\nExit (5)\n");
+        printf("Manage your appointments (1)\nSchedule an appointment (2)\nChange your settings (3)\nView your patients - assigned to you (4)\nShow Balance (5)\nExit (6)\n");
         scanf("%d", &menu);
 
         switch(menu) {
@@ -610,7 +707,7 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
                         }
                     }
 
-                    printf("Delete appointment (1)\nMark as done (2)\nChange appointment (3)\n");
+                    printf("Delete appointment (1)\nMark as done (2)\nChange appointment (3)\n"); //Exit(4)
                     scanf("%d", &submenu);
 
                     switch(submenu) {
@@ -628,12 +725,11 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
                             printf("----------------------\nAppointment marked as done succesfully\n");
                             //Here should be billing part*
                             (*appList)[appid - 1].patient.DappNumber++;
+                            (*appList)[appid - 1].patient.med_history->status = 1;
 
                             Appointment *temp = realloc((*appList)[appid - 1].patient.med_history, (*appList)[appid - 1].patient.DappNumber * sizeof(Appointment));
                             (*appList)[appid - 1].patient.med_history = temp;
-
                             (*appList)[appid - 1].patient.med_history[(*appList)[appid - 1].patient.DappNumber - 1] = (*appList)[appid - 1];
-
                             
                             break;
                         case 3:
@@ -702,6 +798,7 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
 
                 break;
             case 2:
+            while(1){
                 char name[30];
                 int id;
                 printf("Enter the name of patient you want to make an appointment with: ");
@@ -720,8 +817,10 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
                 scanf("%d", &id);
                 getchar();
 
+                
                 Appointment app;
                 app.patient = (*userList)[id-1];
+                app.patient.med_history->status = 0;
                 app.doctor = (*doctor);
                 strcpy(app.service, (*doctor).specialisation);
                 
@@ -753,13 +852,116 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
                     fflush(stdout);
                     sleep(1);
                 }
-
+                printf("Back to previous page (1)\n");
+                int backToPreviousPage;
+                scanf("%d", &backToPreviousPage);
+                if (backToPreviousPage){
+                    break;                    
+                }
+            }
+                
 
                 break;
+            case 3:
+                while(1){
+                printf("----------------------\n");
+                int ch;
+                printf("Enter '1' if you want to change setting & '0' if you do not want to change\n");
+                printf("Name: %s | Change? ", (*doctor).name);
+                scanf("%d", &ch);
+                if (ch) {
+                    printf("Enter new name: ");
+                    scanf("%s", (*doctor).name);
+                }
+                
+                printf("Surname: %s | Change? ", (*doctor).surname);
+                scanf("%d", &ch);
+                if (ch) {
+                    printf("Enter new surname: ");
+                    scanf("%s", (*doctor).surname);
+                }
+
+                printf("Password: %s", (*doctor).password);
+                scanf("%d", &ch);
+                if (ch) {
+                    printf("Enter new surname: ");
+                    scanf("%s", (*doctor).password);
+                }
+
+                printf("Specialisation: %s", (*doctor).specialisation);
+                scanf("%d", &ch);
+                if (ch) {
+                    printf("Enter new specialisation: ");
+                    scanf("%s", (*doctor).specialisation);
+                }
+
+                printf("Contact Info: %s", (*doctor).contactInfo);
+                scanf("%d", &ch);
+                if (ch) {
+                    printf("Enter new contact info: ");
+                    scanf("%s", (*doctor).contactInfo);
+                }
+
+                printf("Availability: %s", (*doctor).availability);
+                scanf("%d", &ch);
+                if (ch) {
+                    printf("Enter new availability time: ");
+                    getchar();
+                    fgets((*doctor).availability, 30, stdin);
+                    (*doctor).availability[strcspn((*doctor).availability, "\n")] = '\0';
+                }
+                printf("----------------------\n");
+
+                printf("Back to previous page (1)\n");
+                int backToPreviousPage;
+                scanf("%d", &backToPreviousPage);
+                if (backToPreviousPage){
+                    break;                    
+                }
+                }
+                break;
+
+                
+            case 4:
+                while(1){
+                printf("----------------------\n");
+                printf("Assigned Patients\n");
+                int assignedUserId = 0;
+                for (int i = 0; i < patientNumber; i++){
+                    if (!strcmp((*userList)[i].assigned_doctor.name, (*doctor).name)){
+                        assignedUserId++;
+                        printf("Assigned user %d\n", assignedUserId);
+                        printf("Patient Name/Surname: %s %s\n",(*userList)[i].name, (*userList)[i].surname);
+                        if ((*userList)[i].gender == 1){
+                            printf("Gender: Male\n");
+                        }
+                        else{
+                            printf("Gender: Male\n");
+                        }
+                        
+                        printf("Age: %d\n", (*userList)[i].age);
+                        printf("Contact info: %s\n", (*userList)[i].contactInfo);
+                        printf("----------------------\n");
+                    }
+                }
+
+                printf("Back to previous page (1)\n");
+                int backToPreviousPage;
+                scanf("%d", &backToPreviousPage);
+                if (backToPreviousPage){
+                    break;                    
+                }
+                }
+                
+                break;               
 
             case 5:
+                printf("Current Balance: %d\n", (*doctor).doctorBalance);
+                break;
+            case 6:
                 return;
                 break;
+
         }
     }
 }
@@ -767,6 +969,7 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
 void registerDoctor (Doctor **doctorList, Patient **userList){
 
     Doctor doctor;
+    doctor.doctorBalance = 0;
     char doctorContactInfo[30];
     doctorNumber++;
 
@@ -873,8 +1076,8 @@ void registerInterface(Patient **userList, Doctor **doctorList){
     printf("Set a password: ");
     scanf("%s", patient.password);
 
-    patient.med_history = malloc(0*sizeof(Appointment));
-    patient.DappNumber = 1;
+    patient.DappNumber = 0;
+    patient.med_history = malloc(patient.DappNumber * sizeof(Appointment));
 
     while (1){
     int sameNumberCount = 0;
@@ -939,7 +1142,7 @@ void registerInterface(Patient **userList, Doctor **doctorList){
 }
 
 
-void loginInterface(Patient **userList, Doctor **doctorList, Appointment **appList) {
+void loginInterface(Patient **userList, Doctor **doctorList, Appointment **appList, Feedback **fedList) {
     int logincycle = 1;
 
     while(logincycle) {
@@ -963,14 +1166,14 @@ void loginInterface(Patient **userList, Doctor **doctorList, Appointment **appLi
         
         if (!strcmp(password, hospitalPassword) && !strcmp(contactInfo, "admin")) {
             logincycle = 0;
-            hospitalInterface(userList, doctorList, appList);
+            hospitalInterface(userList, doctorList, appList, fedList);
             return;
         }
 
         for (int i = 0; i < patientNumber; i++){
             if (!strcmp(password, (*userList)[i].password) && !strcmp(contactInfo, (*userList)[i].contactInfo)){
                 logincycle = 0;
-                patientInterface(&(*userList)[i], appList);
+                patientInterface(&(*userList)[i], appList, fedList);
                 return;
             }
         }
@@ -991,7 +1194,7 @@ void loginInterface(Patient **userList, Doctor **doctorList, Appointment **appLi
 
 
 
-void firstInterface(Patient **userList, Doctor **doctorList, Appointment **appList){
+void firstInterface(Patient **userList, Doctor **doctorList, Appointment **appList, Feedback **fedList){
     while(1) {
         printf("Welcome to the Hospital Management System\n");
         printf("░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n");
@@ -1024,20 +1227,22 @@ void firstInterface(Patient **userList, Doctor **doctorList, Appointment **appLi
         lowercase(choosing);
 
         if (!strcmp(choosing, "login")){
-            loginInterface(userList, doctorList, appList);
+            loginInterface(userList, doctorList, appList, fedList);
         }
         else if(!strcmp(choosing, "register")){
             patientNumber += 1;
             registerInterface(userList, doctorList);
         }
+        else if(!strcmp(choosing, "exit")){
+            break;
+        }
         else{
             printf("Invalid opeartion\n");
             goto againInput;
-        }   
+        }
+        
     }
-}
-
-
+ }
 
 int main(void){
     Patient *userList = malloc(patientNumber * sizeof(Patient));
@@ -1046,8 +1251,13 @@ int main(void){
 
     Appointment *appList = malloc(appNumber * sizeof(Appointment));
 
+    Feedback *fedList = malloc(fedNumber * sizeof(Feedback));
 
-    firstInterface(&userList, &doctorList, &appList);
+    firstInterface(&userList, &doctorList, &appList, &fedList);
+
+    
+
+
 
     free(userList);
     free(doctorList);
