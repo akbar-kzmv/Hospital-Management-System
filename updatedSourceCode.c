@@ -31,7 +31,9 @@ typedef struct Doctor {
 
     char availability[30];
 
-    int doctorBalance;
+    float doctorBalance;
+
+    int appNumberDoc;
         
 
 } Doctor;
@@ -92,7 +94,7 @@ int appNumber = 0;
 int WappNumber = 0;
 int fedNumber = 0;
 
-int hospitalIncome = 0;
+float hospitalIncome = 0;
 
 char hospitalPassword[] = "admin";
 void registerDoctor (Doctor **, Patient **);
@@ -379,6 +381,113 @@ void patientInterface(Patient *patient, Appointment **appList, Feedback **fedLis
 
 }
 
+void userReport(Patient **userList){
+
+    while (1){
+    printf("---------------\n");
+    printf("\tPATIENT REPORT PAGE\t\n");
+    printf("---------------\n");
+
+    printf("Total number of patients: %d\n", patientNumber);
+    printf("---------------\n");
+    printf("Age Distribution:\n");
+    int ageBelow18 = 0;  //Teenagers
+    int ageBetween18And35 = 0;
+    int ageBetween35And60 = 0;
+    int ageAbove60 = 0; //Retired 
+
+    for (int i = 0; i <patientNumber; i++){
+        if ((*userList)[i].age < 18){
+            ageBelow18 ++;
+        }
+        else if((*userList)[i].age >= 18 && (*userList)[i].age < 35){
+            ageBetween18And35++;
+        }
+        else if((*userList)[i].age >= 35 && (*userList)[i].age < 60){
+            ageBetween35And60++;
+        }
+        else if((*userList)[i].age > 60){
+            ageAbove60++;
+        }
+    }
+    printf("Teen patients [0 - 18): %.2f%%\n", 100*(ageBelow18/(float)patientNumber));
+    printf("Patients aged [18 - 35): %.2f%%\n", 100*(ageBetween18And35/(float)patientNumber));
+    printf("Patients aged [35 - 60): %.2f%%\n", 100*(ageBetween35And60/(float)patientNumber));
+    printf("Retitred patients [age > 60]: %.2f%%\n", 100*(ageAbove60/(float)patientNumber));
+    printf("---------------\n");
+
+    printf("Gender distribution: \n");
+    int numberOfMalePatients = 0;
+    int numberOfFemalePatients = 0;
+
+    for (int i = 0; i < patientNumber; i++){
+        if ((*userList)[i].gender == 1){
+            numberOfMalePatients++;
+        }
+        else{
+            numberOfFemalePatients++;
+        }
+    }
+
+    printf("Male Patients: %.2f%%\n", 100*(numberOfMalePatients/(float)patientNumber));
+    printf("Female Patients: %.2f%%\n", 100*(numberOfFemalePatients/(float)patientNumber));
+
+    printf("---------------\n");
+
+    
+    
+    printf("Back to previous menu (1)\n");
+    int backToPreviousMenu = 0;
+    scanf("%d",&backToPreviousMenu);
+    if (backToPreviousMenu){
+        break;
+    }
+    }
+
+    
+    
+}
+
+void doctorReport(Patient **userList, Doctor **doctorList) {
+    printf("Doctor statictics Report: \n");
+    printf("Total number of doctors: %d\n", doctorNumber);
+    printf("Number of patients per doctor: \n");
+    for (int i = 0; i < doctorNumber; i++) {
+        int patientsPerDoc = 0;
+        printf("Dr. %s %s: ", (*doctorList)[i].name, (*doctorList)[i].surname);
+        for (int j = 0; j < patientNumber; j++) {
+            if ((*userList)[j].assigned_doctor.contactInfo == (*doctorList)[i].contactInfo) {
+                patientsPerDoc += 1;
+            }
+        }
+        printf("%d\n", patientsPerDoc);
+
+    }
+
+    if (appNumber > 0) {
+        printf("The busiest doctor: ");
+        int maxApp = 0;
+        Doctor busyDoc;
+        for (int i = 0; i < appNumber; i++) {
+            if ((*doctorList)[i].appNumberDoc > maxApp) {
+                maxApp = (*doctorList)[i].appNumberDoc;
+                busyDoc = (*doctorList)[i];
+            }
+
+        }
+        printf("Dr. %s %s\n", busyDoc.name, busyDoc.surname);
+    }
+
+}
+
+void revenueReport(Doctor **doctorList){
+    printf("Hospital Income: %g₼\n", hospitalIncome);
+    printf("Income of doctors: \n");
+    for (int i = 0; i < doctorNumber; i++){
+        printf("Dr. %s %s: %g₼\n", (*doctorList)[i].name, (*doctorList)[i].surname, (*doctorList)[i].doctorBalance);
+        
+    }
+}
 void hospitalInterface(Patient **userList, Doctor **doctorList, Appointment **appList, Feedback **fedList) {
     int menu;
     int submenu; 
@@ -653,7 +762,7 @@ void hospitalInterface(Patient **userList, Doctor **doctorList, Appointment **ap
                         
                     }
                     else if(choose == 2){
-                        doctorReport(doctorList);
+                        doctorReport(userList, doctorList);
                     }
                     else if(choose == 3){
                         revenueReport(doctorList);
@@ -844,6 +953,7 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
                     fflush(stdout);
                     sleep(1);
                 }
+                (*doctor).appNumberDoc += 1;
 
                 printf("\nAppointment scheduled successfully\n");
 
@@ -956,7 +1066,7 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
                 break;               
 
             case 5:
-                printf("Current Balance: %d\n", (*doctor).doctorBalance);
+                printf("Current Balance: %g\n", (*doctor).doctorBalance);
                 break;
             case 6:
                 return;
@@ -970,6 +1080,7 @@ void registerDoctor (Doctor **doctorList, Patient **userList){
 
     Doctor doctor;
     doctor.doctorBalance = 0;
+    doctor.appNumberDoc = 0;
     char doctorContactInfo[30];
     doctorNumber++;
 
