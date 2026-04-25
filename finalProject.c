@@ -220,14 +220,18 @@ void patientInterface(Patient *patient, Appointment **appList, Feedback **fedLis
             printf("Empty\n");
         }
         else{
-            printf("+-------------+-------------------------+-------------------------+----------------+----------------------+------------+\n");
-            printf(" %-11s | %-23s | %-23s | %-14s | %-20s | %-10s |\n", "Appointment", "Patient Fullname", "Doctor Fullname", "Service", "Date", "Payment");
-            printf("+-------------+-------------------------+-------------------------+----------------+----------------------+------------+\n");
+            printf("+-------------+-------------------------+-------------------------+----------------+----------------------+------------+------------+\n");
+            printf(" %-11s | %-23s | %-23s | %-14s | %-20s | %-10s | %-10s |\n", "Appointment", "Patient Fullname", "Doctor Fullname", "Service", "Date", "Payment", "Payed");
+            printf("+-------------+-------------------------+-------------------------+----------------+----------------------+------------+------------+\n");
             for (int i = 0; i < (*patient).DappNumber; i++){
-                printf(" %-11d | %-10s %-12s | %-10s %-12s | %-14s | %-20s | %-10d |\n", i+1, ((*patient).med_history[i]).patient.name, ((*patient).med_history[i].patient.surname), (*patient).med_history[i].doctor.name, (*patient).med_history[i].doctor.surname, (*patient).med_history[i].doctor.specialisation, (*patient).med_history[i].time, (*patient).med_history[i].payment);
+                char payeds[5];
+                if ((*patient).med_history[i].payed) strcpy(payeds, "Yes");
+                else strcpy(payeds, "No");
+                printf(" %-11d | %-10s %-12s | %-10s %-12s | %-14s | %-20s | %-10d | %-10s |\n", i+1, ((*patient).med_history[i]).patient.name, ((*patient).med_history[i].patient.surname), (*patient).med_history[i].doctor.name, (*patient).med_history[i].doctor.surname, (*patient).med_history[i].doctor.specialisation, (*patient).med_history[i].time, (*patient).med_history[i].payment, payeds);
             }
-            printf("+-------------+-------------------------+-------------------------+----------------+----------------------+------------+\n");
+            printf("+-------------+-------------------------+-------------------------+----------------+----------------------+------------+------------+\n");
         }
+        
         break;
     case 3:
     while(1){
