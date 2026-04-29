@@ -1023,6 +1023,7 @@ void doctorInterface (Doctor *doctor, Patient **userList, Appointment **appList)
                                 (*userList)[patientID].med_history = temp;
                                 (*userList)[patientID].med_history[(*userList)[patientID].DappNumber - 1] = (*appList)[appid - 1];
                                 (*doctor).WappNumber--; 
+                                (*userList)[patientID].myAppointmentCount--;
                                 printf("----------------------\nAppointment marked as done succesfully\n");
                             }
                             else {
@@ -1296,7 +1297,7 @@ void registerDoctor (Doctor **doctorList, Patient **userList){
 
     for (int i = 0; i < doctorNumber; i++){
         if (!strcmp(doctorContactInfo, (*doctorList)[i].contactInfo)){
-            printf("Number already taken!\n");
+            printf("Number already registered\n");
             sameNumberCount++;
             break;
         }
@@ -1304,7 +1305,7 @@ void registerDoctor (Doctor **doctorList, Patient **userList){
         if (i == doctorNumber - 1){
             for (int j = 0; j < patientNumber; j++){
                 if (!strcmp(doctorContactInfo, (*userList)[j].contactInfo)){
-                printf("This number already taken!\n");
+                printf("Number already registered\n");
                 sameNumberCount++;
                 break;
                 }
@@ -1402,7 +1403,7 @@ void registerInterface(Patient **userList, Doctor **doctorList){
 
     for(int i = 0; i < patientNumber; i++){
         if(!strcmp(patientContactInfo, (*userList)[i].contactInfo)){
-            printf("This number already taken!\n");
+            printf("Number already registered\n");
             sameNumberCount++;
             break;
             
@@ -1410,7 +1411,7 @@ void registerInterface(Patient **userList, Doctor **doctorList){
         if (i == patientNumber - 1){
             for (int j = 0; j < doctorNumber; j++){
                 if (!strcmp(patientContactInfo, (*doctorList)[j].contactInfo)){
-                printf("This number already taken!\n");
+                printf("Number already registered\n");
                 sameNumberCount++;
                 break;
                 }
